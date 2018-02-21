@@ -422,13 +422,17 @@ The other one is to explicitly check the cancellation status. Let us try the lat
 
 Replace `while (i < 5)` in the previous example with `while (isActive)` and rerun it. 
 
+<!--- INCLUDE
+import kotlin.coroutines.experimental.*
+-->
+
 ```kotlin
 fun main(args: Array<String>) = runBlocking<Unit> {
     val startTime = System.currentTimeMillis()
     val job = launch {
         var nextPrintTime = startTime
         var i = 0
-        while (isActive) { // cancellable computation loop
+        while (coroutineContext.isActive) { // cancellable computation loop
             // print a message twice a second
             if (System.currentTimeMillis() >= nextPrintTime) {
                 println("I'm sleeping ${i++} ...")
@@ -620,7 +624,7 @@ remote service call or computation. We just pretend they are useful, but actuall
 delays for a second for the purpose of this example:
 
 <!--- INCLUDE .*/example-compose-([0-9]+).kt
-import kotlin.system.measureTimeMillis
+import kotlin.system.*
 -->
 
 ```kotlin
@@ -807,6 +811,10 @@ parameter that can be used to explicitly specify the dispatcher for new coroutin
 
 Try the following example:
 
+<!--- INCLUDE
+import kotlin.coroutines.experimental.*
+-->
+
 ```kotlin
 fun main(args: Array<String>) = runBlocking<Unit> {
     val jobs = arrayListOf<Job>()
@@ -863,6 +871,10 @@ This way, a parent context can be inherited. The default dispatcher for [runBloc
 is confined to the invoker thread, so inheriting it has the effect of confining execution to
 this thread with a predictable FIFO scheduling.
 
+<!--- INCLUDE
+import kotlin.coroutines.experimental.*
+-->
+
 ```kotlin
 fun main(args: Array<String>) = runBlocking<Unit> {
     val jobs = arrayListOf<Job>()
@@ -907,6 +919,10 @@ by logging frameworks. When using coroutines, the thread name alone does not giv
 `kotlinx.coroutines` includes debugging facilities to make it easier. 
 
 Run the following code with `-Dkotlinx.coroutines.debug` JVM option:
+
+<!--- INCLUDE
+import kotlin.coroutines.experimental.*
+-->
 
 ```kotlin
 fun log(msg: String) = println("[${Thread.currentThread().name}] $msg")
@@ -990,6 +1006,10 @@ are created with [newSingleThreadContext] when they are no longer needed.
 The coroutine's [Job] is part of its context. The coroutine can retrieve it from its own context 
 using `coroutineContext[Job]` expression:
 
+<!--- INCLUDE  
+import kotlin.coroutines.experimental.*
+-->
+
 ```kotlin
 fun main(args: Array<String>) = runBlocking<Unit> {
     println("My job is ${coroutineContext[Job]}")
@@ -1016,6 +1036,10 @@ the [Job] of the new coroutine becomes
 a _child_ of the parent coroutine's job. When the parent coroutine is cancelled, all its children
 are recursively cancelled, too. 
   
+<!--- INCLUDE
+import kotlin.coroutines.experimental.*
+-->
+
 ```kotlin
 fun main(args: Array<String>) = runBlocking<Unit> {
     // launch a coroutine to process some kind of incoming request
@@ -1063,6 +1087,10 @@ Coroutine contexts can be combined using `+` operator. The context on the right-
 of the context on the left-hand side. For example, a [Job] of the parent coroutine can be inherited, while 
 its dispatcher replaced:
 
+<!--- INCLUDE
+import kotlin.coroutines.experimental.*
+-->
+
 ```kotlin
 fun main(args: Array<String>) = runBlocking<Unit> {
     // start a coroutine to process some kind of incoming request
@@ -1097,6 +1125,10 @@ main: Who has survived request cancellation?
 
 A parent coroutine always waits for completion of all its children. Parent does not have to explicitly track
 all the children it launches and it does not have to use [Job.join] to wait for them at the end:
+
+<!--- INCLUDE
+import kotlin.coroutines.experimental.*
+-->
 
 ```kotlin
 fun main(args: Array<String>) = runBlocking<Unit> {
@@ -1188,6 +1220,10 @@ we can write `launch(coroutineContext, parent = job)` to make explicit the fact 
 Now, a single invocation of [Job.cancel] cancels all the children we've launched. 
 Moreover, [Job.join] waits for all of them to complete, so we can also use [cancelAndJoin] here in
 this example:
+
+<!--- INCLUDE
+import kotlin.coroutines.experimental.*
+-->
 
 ```kotlin
 fun main(args: Array<String>) = runBlocking<Unit> {
@@ -1394,8 +1430,8 @@ of coroutines. We start with an infinite sequence of numbers. This time we intro
 explicit `context` parameter and pass it to [produce] builder, 
 so that caller can control where our coroutines run:
  
-<!--- INCLUDE core/kotlinx-coroutines-core/src/test/kotlin/guide/example-channel-05.kt  
-import kotlin.coroutines.experimental.CoroutineContext
+<!--- INCLUDE  
+import kotlin.coroutines.experimental.*
 -->
  
 ```kotlin
@@ -1539,6 +1575,10 @@ Multiple coroutines may send to the same channel.
 For example, let us have a channel of strings, and a suspending function that 
 repeatedly sends a specified string to this channel with a specified delay:
 
+<!--- INCLUDE  
+import kotlin.coroutines.experimental.*
+-->
+
 ```kotlin
 suspend fun sendString(channel: SendChannel<String>, s: String, time: Long) {
     while (true) {
@@ -1590,6 +1630,10 @@ similar to the `BlockingQueue` with a specified capacity, which blocks when buff
 
 Take a look at the behavior of the following code:
 
+<!--- INCLUDE  
+import kotlin.coroutines.experimental.*
+-->
+
 ```kotlin
 fun main(args: Array<String>) = runBlocking<Unit> {
     val channel = Channel<Int>(4) // create buffered channel
@@ -1627,6 +1671,10 @@ Send and receive operations to channels are _fair_ with respect to the order of 
 multiple coroutines. They are served in first-in first-out order, e.g. the first coroutine to invoke `receive` 
 gets the element. In the following example two coroutines "ping" and "pong" are 
 receiving the "ball" object from the shared "table" channel. 
+
+<!--- INCLUDE
+import kotlin.coroutines.experimental.*
+-->
 
 ```kotlin
 data class Ball(var hits: Int)
@@ -1680,22 +1728,21 @@ but others are unique.
 Let us launch a thousand coroutines all doing the same action thousand times (for a total of a million executions). 
 We'll also measure their completion time for further comparisons:
 
-<!--- INCLUDE .*/example-sync-([0-9a-z]+).kt
-import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.system.measureTimeMillis
--->
-
 <!--- INCLUDE .*/example-sync-03.kt
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.*
 -->
 
 <!--- INCLUDE .*/example-sync-06.kt
-import kotlinx.coroutines.experimental.sync.Mutex
-import kotlinx.coroutines.experimental.sync.withLock
+import kotlinx.coroutines.experimental.sync.*
 -->
 
 <!--- INCLUDE .*/example-sync-07.kt
 import kotlinx.coroutines.experimental.channels.*
+-->
+
+<!--- INCLUDE .*/example-sync-([0-9a-z]+).kt
+import kotlin.system.*
+import kotlin.coroutines.experimental.*
 -->
 
 ```kotlin
@@ -1999,8 +2046,9 @@ import kotlinx.coroutines.experimental.selects.*
 
 Let us have two producers of strings: `fizz` and `buzz`. The `fizz` produces "Fizz" string every 300 ms:
 
-<!--- INCLUDE .*/example-select-01.kt
-import kotlin.coroutines.experimental.CoroutineContext
+<!--- INCLUDE
+import kotlinx.coroutines.experimental.*
+import kotlin.coroutines.experimental.*
 -->
 
 ```kotlin
@@ -2076,6 +2124,10 @@ The [onReceive][ReceiveChannel.onReceive] clause in `select` fails when the chan
 specific action when the channel is closed. The following example also shows that `select` is an expression that returns 
 the result of its selected clause:
 
+<!--- INCLUDE
+import kotlin.coroutines.experimental.*
+-->
+
 ```kotlin
 suspend fun selectAorB(a: ReceiveChannel<String>, b: ReceiveChannel<String>): String =
     select<String> {
@@ -2149,7 +2201,7 @@ Let us write an example of producer of integers that sends its values to a `side
 the consumers on its primary channel cannot keep up with it:
 
 <!--- INCLUDE
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.experimental.*
 -->
 
 ```kotlin
@@ -2165,7 +2217,7 @@ fun produceNumbers(context: CoroutineContext, side: SendChannel<Int>) = produce<
 ```
 
 Consumer is going to be quite slow, taking 250 ms to process each number:
- 
+
 ```kotlin
 fun main(args: Array<String>) = runBlocking<Unit> {
     val side = Channel<Int>() // allocate side channel
@@ -2265,10 +2317,14 @@ Let us write a channel producer function that consumes a channel of deferred str
 deferred value, but only until the next deferred value comes over or the channel is closed. This example puts together 
 [onReceiveOrNull][ReceiveChannel.onReceiveOrNull] and [onAwait][Deferred.onAwait] clauses in the same `select`:
 
+<!--- INCLUDE
+import kotlin.coroutines.experimental.*
+-->
+
 ```kotlin
 fun switchMapDeferreds(input: ReceiveChannel<Deferred<String>>) = produce<String> {
     var current = input.receive() // start with first received deferred value
-    while (isActive) { // loop while not cancelled/closed
+    while (coroutineContext.isActive) { // loop while not cancelled/closed
         val next = select<Deferred<String>?> { // return next deferred value from this select or null
             input.onReceiveOrNull { update ->
                 update // replaces next value to wait
@@ -2351,8 +2407,7 @@ Channel was closed
 [Job.join]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-job/join.html
 [CancellationException]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-cancellation-exception/index.html
 [yield]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/yield.html
-[CoroutineScope.isActive]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-coroutine-scope/is-active.html
-[CoroutineScope]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-coroutine-scope/index.html
+[CoroutineScope]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-coroutine-scope.html
 [withContext]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/with-context.html
 [NonCancellable]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-non-cancellable/index.html
 [withTimeout]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/with-timeout.html
@@ -2365,7 +2420,6 @@ Channel was closed
 [CoroutineDispatcher]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-coroutine-dispatcher/index.html
 [DefaultDispatcher]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-default-dispatcher.html
 [CommonPool]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-common-pool/index.html
-[CoroutineScope.coroutineContext]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-coroutine-scope/coroutine-context.html
 [Unconfined]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-unconfined/index.html
 [newSingleThreadContext]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/new-single-thread-context.html
 [ThreadPoolDispatcher.close]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-thread-pool-dispatcher/close.html

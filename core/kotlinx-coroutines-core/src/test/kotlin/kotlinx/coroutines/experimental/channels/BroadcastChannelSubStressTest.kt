@@ -17,11 +17,12 @@
 package kotlinx.coroutines.experimental.channels
 
 import kotlinx.coroutines.experimental.*
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicLong
+import org.junit.*
+import org.junit.runner.*
+import org.junit.runners.*
+import java.util.concurrent.*
+import java.util.concurrent.atomic.*
+import kotlin.coroutines.experimental.*
 
 /**
  * Creates a broadcast channel and repeatedly opens new subscription, receives event, closes it,
@@ -51,14 +52,14 @@ class BroadcastChannelSubStressTest(
         val ctx = coroutineContext + CommonPool
         val sender =
             launch(context = ctx + CoroutineName("Sender")) {
-                while (isActive) {
+                while (coroutineContext.isActive) {
                     broadcast.send(sentTotal.incrementAndGet())
                 }
             }
         val receiver =
             launch(context = ctx + CoroutineName("Receiver")) {
                 var last = -1L
-                while (isActive) {
+                while (coroutineContext.isActive) {
                     broadcast.openSubscription().use { sub ->
                         val i = sub.receive()
                         check(i >= last) { "Last was $last, got $i" }

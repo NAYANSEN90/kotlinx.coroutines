@@ -50,7 +50,7 @@ Integration with Guava [ListenableFuture](https://github.com/google/guava/wiki/L
 
 <!--- MODULE kotlinx-coroutines-core -->
 <!--- INDEX kotlinx.coroutines.experimental -->
-[CoroutineScope]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-coroutine-scope/index.html
+[CoroutineScope]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.experimental/-coroutine-scope.html
 <!--- MODULE kotlinx-coroutines-guava -->
 <!--- INDEX kotlinx.coroutines.experimental.guava -->
 [future]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-guava/kotlinx.coroutines.experimental.guava/future.html

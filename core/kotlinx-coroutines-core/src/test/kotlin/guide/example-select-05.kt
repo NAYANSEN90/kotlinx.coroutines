@@ -20,10 +20,11 @@ package guide.select.example05
 import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.channels.*
 import kotlinx.coroutines.experimental.selects.*
+import kotlin.coroutines.experimental.*
 
 fun switchMapDeferreds(input: ReceiveChannel<Deferred<String>>) = produce<String> {
     var current = input.receive() // start with first received deferred value
-    while (isActive) { // loop while not cancelled/closed
+    while (coroutineContext.isActive) { // loop while not cancelled/closed
         val next = select<Deferred<String>?> { // return next deferred value from this select or null
             input.onReceiveOrNull { update ->
                 update // replaces next value to wait

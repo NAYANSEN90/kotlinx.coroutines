@@ -17,13 +17,13 @@
 package kotlinx.coroutines.experimental.channels
 
 import kotlinx.coroutines.experimental.*
-import kotlinx.coroutines.experimental.selects.select
-import org.junit.After
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicLong
+import kotlinx.coroutines.experimental.selects.*
+import org.junit.*
+import org.junit.runner.*
+import org.junit.runners.*
+import java.util.concurrent.*
+import java.util.concurrent.atomic.*
+import kotlin.coroutines.experimental.*
 
 /**
  * Tests delivery of events to multiple broadcast channel subscribers.
@@ -62,7 +62,7 @@ class BroadcastChannelMultiReceiveStressTest(
         val sender =
             launch(context = ctx + CoroutineName("Sender")) {
                 var i = 0L
-                while (isActive) {
+                while (coroutineContext.isActive) {
                     broadcast.send(++i)
                     sentTotal.set(i) // set sentTotal only if `send` was not cancelled
                 }

@@ -464,6 +464,23 @@ public actual suspend fun Job.joinChildren() {
 // -------------------- CoroutineContext extensions --------------------
 
 /**
+ * Returns `true` when the [Job] of the coroutine in this context is still active
+ * (has not completed and was not cancelled yet).
+ *
+ * Check this property in long-running computation loops to support cancellation:
+ * ```
+ * while (coroutineContext.isActive) {
+ *     // do some computation
+ * }
+ * ```
+ *
+ * The `coroutineContext.isActive` expression is a shortcut for `coroutineContext[Job]?.isActive == true`.
+ * See [Job.isActive].
+ */
+public actual val CoroutineContext.isActive: Boolean
+    get() = this[Job]?.isActive == true
+
+/**
  * Cancels [Job] of this context with an optional cancellation [cause]. The result is `true` if the job was
  * cancelled as a result of this invocation and `false` if there is no job in the context or if it was already
  * cancelled or completed. See [Job.cancel] for details.

@@ -201,9 +201,11 @@ public interface SelectInstance<in R> {
  * was already resumed on atomically cancellable clause and the continuation was posted for execution to the thread's queue.
  *
  * Note, that this function does not check for cancellation when it is not suspended.
- * Use [yield] or [CoroutineScope.isActive] to periodically check for cancellation in tight loops if needed.
+ * Use [yield] or
+ * [coroutineContext][kotlin.coroutines.experimental.coroutineContext].[isActive][kotlinx.coroutines.experimental.isActive]
+ * to periodically check for cancellation in tight loops if needed.
  */
-public inline suspend fun <R> select(crossinline builder: SelectBuilder<R>.() -> Unit): R =
+public suspend inline fun <R> select(crossinline builder: SelectBuilder<R>.() -> Unit): R =
     suspendCoroutineOrReturn { cont ->
         val scope = SelectBuilderImpl(cont)
         try {

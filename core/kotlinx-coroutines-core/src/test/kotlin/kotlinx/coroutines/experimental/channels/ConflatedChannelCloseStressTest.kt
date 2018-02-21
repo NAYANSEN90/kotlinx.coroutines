@@ -21,6 +21,7 @@ import org.junit.After
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.coroutines.experimental.*
 
 class ConflatedChannelCloseStressTest : TestBase() {
 
@@ -47,7 +48,7 @@ class ConflatedChannelCloseStressTest : TestBase() {
             launch(pool) {
                 var x = senderId
                 try {
-                    while (isActive) {
+                    while (coroutineContext.isActive) {
                         try {
                             curChannel.get().offer(x)
                             x += nSenders
@@ -64,7 +65,7 @@ class ConflatedChannelCloseStressTest : TestBase() {
         val closerJob = Job()
         val closer = launch(pool) {
             try {
-                while (isActive) {
+                while (coroutineContext.isActive) {
                     flipChannel()
                     closed.incrementAndGet()
                     yield()
@@ -74,7 +75,7 @@ class ConflatedChannelCloseStressTest : TestBase() {
             }
         }
         val receiver = async(pool) {
-            while (isActive) {
+            while (coroutineContext.isActive) {
                 curChannel.get().receiveOrNull()
                 received.incrementAndGet()
             }

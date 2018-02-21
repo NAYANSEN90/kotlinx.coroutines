@@ -16,29 +16,29 @@
 
 package kotlinx.coroutines.experimental
 
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.experimental.*
 
 /**
- * Receiver interface for generic coroutine builders, so that the code inside coroutine has a convenient access
- * to its [coroutineContext] and its cancellation status via [isActive].
+ * Receiver interface for generic coroutine builders.
  */
-public actual interface CoroutineScope {
+@Deprecated("No replacement, will be removed in the future.")
+public interface CoroutineScope {
     /**
      * Returns `true` when this coroutine is still active (has not completed and was not cancelled yet).
      *
-     * Check this property in long-running computation loops to support cancellation:
-     * ```
-     * while (isActive) {
-     *     // do some computation
-     * }
-     * ```
-     *
-     * This property is a shortcut for `coroutineContext[Job]!!.isActive`. See [coroutineContext] and [Job].
+     * @suppress **Deprecated**: Replace with `coroutineContext.isActive`.
      */
-    public actual val isActive: Boolean
+    @Deprecated("Replace with `coroutineContext.isActive`",
+        replaceWith = ReplaceWith("coroutineContext.isActive",
+            "kotlin.coroutines.experimental.coroutineContext",
+            "kotlinx.coroutines.experimental.isActive"))
+    public val isActive: Boolean
 
     /**
      * Returns the context of this coroutine.
+     *
+     * @suppress: **Deprecated**: Replaced with top-level [kotlin.coroutines.experimental.coroutineContext].
      */
-    public actual val coroutineContext: CoroutineContext
+    @Deprecated("Replace with top-level coroutineContext", level = DeprecationLevel.HIDDEN)
+    public val coroutineContext: CoroutineContext
 }
